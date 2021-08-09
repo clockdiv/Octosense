@@ -12,29 +12,37 @@ Buttons::Buttons(ShiftRegister74HC595<4> *_sr)
 }
 
 /* ------------------------------------------ */
-uint8_t Buttons::update(uint8_t* _buttonsPressed)
+uint8_t Buttons::update(uint8_t *_buttonsPressed)
 {
     for (int i = 0; i < btnsCnt; i++)
     {
         setButtonsHigh();
         sr->set(btns[i], LOW);
         delay(10);
-        
-         _buttonsPressed[i] = 0;
-         _buttonsPressed[i+8] = 0;
+
+        _buttonsPressed[i] = 0;
+        _buttonsPressed[i + 8] = 0;
 
         uint8_t b1 = digitalRead(PIN_BUTTON_1);
         uint8_t b2 = digitalRead(PIN_BUTTON_2);
         if (b1 == LOW)
         {
-            Serial.println("b1");
             _buttonsPressed[i] = 1;
+            buttons[i].setState(HIGH);
         }
-        if (b2 == LOW) {
-            Serial.println("b2");
-            _buttonsPressed[i+8] = 1;
+        else
+        {
+            buttons[i].setState(LOW);
         }
-
+        if (b2 == LOW)
+        {
+            _buttonsPressed[i + 8] = 1;
+            buttons[i + 8].setState(HIGH);
+        }
+        else
+        {
+            buttons[i + 8].setState(LOW);
+        }
     }
 }
 

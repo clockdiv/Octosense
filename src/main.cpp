@@ -13,27 +13,41 @@ ShiftRegister74HC595<SHIFT_REGISTER_CNT> sr(PIN_SERIALDATA, PIN_CLOCK, PIN_LATCH
 
 Buttons buttons(&sr);
 
-uint8_t buttonsPressed[16];
+uint8_t buttonsPressed[16] = {};
 
 // function declarations
 void startupLEDSequence();
 void mapButtonsToLEDs();
+void checkButtons();
+
 
 /* ------------------------------------------ */
 void setup()
 {
-  for (int i = 0; i < 16; i++)
-  {
-    buttonsPressed[i] = 0;
-  }
-  //startupLEDSequence();
+  startupLEDSequence();
 }
 
 /* ------------------------------------------ */
 void loop()
 {
   buttons.update(buttonsPressed);
-  mapButtonsToLEDs();
+  //mapButtonsToLEDs();
+  checkButtons();
+}
+
+/* ------------------------------------------ */
+void checkButtons() {
+  for(int i = 0; i < 16; i++) {
+    if(buttons.buttons[i].hasRisen() ){
+      Serial.print(i);
+      Serial.println(" has risen");
+    }
+    if(buttons.buttons[i].hasFallen() ){
+      Serial.print(i);
+      Serial.println(" has fallen");
+    }
+
+  }
 }
 
 /* ------------------------------------------ */
@@ -70,10 +84,12 @@ void mapButtonsToLEDs()
 {
   for (uint8_t i = 0; i < 8; i++)
   {
-    // check buttons 0-7 (A, B, C, D, E, F, CAL, INVERT)
-    sr.set(ledsButtons[i], buttonsPressed[i]);
+    // check buttons 
+    if(i <= ledsButtonsCnt) 
+      sr.set(ledsButtons[i], buttonsPressed[i]);
     
-    // check buttons 8-14 (, 15 is not in use)
-    sr.set(ledsMeters[i], buttonsPressed[i + 8]);
+    // check buttons 
+    if(i <= ledsMeterCnt) 
+      sr.set(ledsMeters[i], buttonsPressed[i + 8]);
   }
 }
