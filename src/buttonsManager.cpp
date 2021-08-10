@@ -1,10 +1,10 @@
 #include <Arduino.h>
-#include "buttons.h"
+#include "buttonsManager.h"
 
-ShiftRegister74HC595<SHIFT_REGISTER_CNT> *Buttons::sr;
+ShiftRegister74HC595<SHIFT_REGISTER_CNT> *ButtonsManager::sr;
 
 /* ------------------------------------------ */
-Buttons::Buttons(ShiftRegister74HC595<4> *_sr)
+ButtonsManager::ButtonsManager(ShiftRegister74HC595<4> *_sr)
 {
     sr = _sr;
     pinMode(PIN_BUTTON_1, INPUT_PULLUP);
@@ -12,7 +12,7 @@ Buttons::Buttons(ShiftRegister74HC595<4> *_sr)
 }
 
 /* ------------------------------------------ */
-uint8_t Buttons::update(uint8_t *_buttonsPressed)
+uint8_t ButtonsManager::update()
 {
     for (int i = 0; i < btnsCnt; i++)
     {
@@ -20,14 +20,10 @@ uint8_t Buttons::update(uint8_t *_buttonsPressed)
         sr->set(btns[i], LOW);
         delay(10);
 
-        _buttonsPressed[i] = 0;
-        _buttonsPressed[i + 8] = 0;
-
         uint8_t b1 = digitalRead(PIN_BUTTON_1);
         uint8_t b2 = digitalRead(PIN_BUTTON_2);
         if (b1 == LOW)
         {
-            _buttonsPressed[i] = 1;
             buttons[i].setState(HIGH);
         }
         else
@@ -36,7 +32,6 @@ uint8_t Buttons::update(uint8_t *_buttonsPressed)
         }
         if (b2 == LOW)
         {
-            _buttonsPressed[i + 8] = 1;
             buttons[i + 8].setState(HIGH);
         }
         else
@@ -47,7 +42,7 @@ uint8_t Buttons::update(uint8_t *_buttonsPressed)
 }
 
 /* ------------------------------------------ */
-void Buttons::setButtonsHigh()
+void ButtonsManager::setButtonsHigh()
 {
     for (int i = 0; i < btnsCnt; i++)
     {

@@ -7,7 +7,7 @@ class Button
 {
 private:
     uint8_t buttonIndex;
-    bool state, stateOld;
+    bool state, stateOld, _hasRisen, _hasFallen;
     
 
 public:

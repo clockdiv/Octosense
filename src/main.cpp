@@ -7,46 +7,99 @@
 #include "pinsArduino.h"
 #endif
 
-#include "buttons.h"
+#include "buttonsManager.h"
+#include "octoChannel.h"
 
 ShiftRegister74HC595<SHIFT_REGISTER_CNT> sr(PIN_SERIALDATA, PIN_CLOCK, PIN_LATCH);
 
-Buttons buttons(&sr);
-
-uint8_t buttonsPressed[16] = {};
+ButtonsManager buttonsmanager(&sr);
+OctoChannel channels[5];
 
 // function declarations
 void startupLEDSequence();
-void mapButtonsToLEDs();
-void checkButtons();
-
+void mapButtonsToLEDs(); // test function
+void buttonsTest();      // test function
+void updateButtons();
+void updateChannels();
 
 /* ------------------------------------------ */
 void setup()
 {
+  // init channels and their led-ids
+  OctoChannel::initShiftRegister(&sr);
+  for (int i = 0; i < 6; i++)
+  {
+    channels[i].init(i);
+  }
+
   startupLEDSequence();
 }
 
 /* ------------------------------------------ */
 void loop()
 {
-  buttons.update(buttonsPressed);
-  //mapButtonsToLEDs();
-  checkButtons();
+  updateButtons();
+  updateChannels();
+
+  // mapButtonsToLEDs();
+  // buttonsTest();
 }
 
 /* ------------------------------------------ */
-void checkButtons() {
-  for(int i = 0; i < 16; i++) {
-    if(buttons.buttons[i].hasRisen() ){
+void updateButtons()
+{
+  buttonsmanager.update();
+
+  if (buttonsmanager.buttons[BTN_A].hasRisen())
+  {
+    OctoChannel::setChannel(0);
+  }
+  else if (buttonsmanager.buttons[BTN_B].hasRisen())
+  {
+    OctoChannel::setChannel(1);
+  }
+  else if (buttonsmanager.buttons[BTN_C].hasRisen())
+  {
+    OctoChannel::setChannel(2);
+  }
+  else if (buttonsmanager.buttons[BTN_D].hasRisen())
+  {
+    OctoChannel::setChannel(3);
+  }
+  else if (buttonsmanager.buttons[BTN_E].hasRisen())
+  {
+    OctoChannel::setChannel(4);
+  }
+  else if (buttonsmanager.buttons[BTN_F].hasRisen())
+  {
+    OctoChannel::setChannel(5);
+  }
+}
+
+/* ------------------------------------------ */
+void updateChannels()
+{
+  for (int i = 0; i < 6; i++)
+  {
+    channels[i].update();
+  }
+}
+
+/* ------------------------------------------ */
+void buttonsTest()
+{
+  for (int i = 0; i < 16; i++)
+  {
+    if (buttonsmanager.buttons[i].hasRisen())
+    {
       Serial.print(i);
       Serial.println(" has risen");
     }
-    if(buttons.buttons[i].hasFallen() ){
+    else if (buttonsmanager.buttons[i].hasFallen())
+    {
       Serial.print(i);
       Serial.println(" has fallen");
     }
-
   }
 }
 
@@ -84,12 +137,12 @@ void mapButtonsToLEDs()
 {
   for (uint8_t i = 0; i < 8; i++)
   {
-    // check buttons 
-    if(i <= ledsButtonsCnt) 
-      sr.set(ledsButtons[i], buttonsPressed[i]);
-    
-    // check buttons 
-    if(i <= ledsMeterCnt) 
-      sr.set(ledsMeters[i], buttonsPressed[i + 8]);
+    // check buttons
+    if (i <= ledsButtonsCnt)
+      sr.set(ledsButtons[i], buttonsmanager.buttons[i].getState());
+
+    // check buttons
+    if (i <= ledsMeterCnt)
+      sr.set(ledsMeters[i], buttonsmanager.buttons[i + 8].getState());
   }
 }

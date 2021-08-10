@@ -4,35 +4,40 @@ Button::Button()
 {
     state = LOW;
     stateOld = LOW;
+    _hasRisen = false;
+    _hasFallen = false;
 }
 
 void Button::setState(bool _state)
 {
     state = _state;
+    if(stateOld == LOW && state == HIGH) _hasRisen = true;
+    else if (stateOld == HIGH && state == LOW) _hasFallen = true;
+    stateOld = state;
 }
 
 bool Button::getState()
 {
-    stateOld = state;
+    // stateOld = state;
     return state;
 }
 
 bool Button::hasRisen()
 {
-    if (stateOld == LOW && state == HIGH)
-    {
-        stateOld = state;
+    if(_hasRisen) {
+        _hasRisen = false;
         return true;
+    } else {
+        return false;
     }
-    return false;
 }
 
 bool Button::hasFallen()
 {
-    if (stateOld == HIGH && state == LOW)
-    {
-        stateOld = state;
+    if(_hasFallen) {
+        _hasFallen = false;
         return true;
+    } else {
+        return false;
     }
-    return false;
 }
