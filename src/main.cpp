@@ -9,11 +9,15 @@
 
 #include "buttonsManager.h"
 #include "octoChannel.h"
+#include "voltmeter.h"
+
+#define CHANNEL_COUNT 5
 
 ShiftRegister74HC595<SHIFT_REGISTER_CNT> sr(PIN_SERIALDATA, PIN_CLOCK, PIN_LATCH);
 
 ButtonsManager buttonsmanager(&sr);
-OctoChannel channels[5];
+OctoChannel channels[CHANNEL_COUNT];
+Voltmeter voltmeter(&sr);
 
 // function declarations
 void startupLEDSequence();
@@ -26,13 +30,23 @@ void updateChannels();
 void setup()
 {
   // init channels and their led-ids
-  OctoChannel::initShiftRegister(&sr);
-  for (int i = 0; i < 6; i++)
+  OctoChannel::init(&sr, &voltmeter);
+  /*   for (int i = 0; i < CHANNEL_COUNT; i++)
   {
     channels[i].init(i);
   }
+ */
+  channels[0].init(0, ledsButtons[0], PIN_INPUT_A);
+  channels[1].init(1, ledsButtons[1], PIN_INPUT_B);
+  channels[2].init(2, ledsButtons[2], PIN_INPUT_C);
+  channels[3].init(3, ledsButtons[3], PIN_INPUT_D);
+  channels[4].init(4, ledsButtons[4], PIN_INPUT_E);
 
   startupLEDSequence();
+
+  // switch to channel 0 at startup
+  OctoChannel::setChannel(1);
+  updateChannels();
 }
 
 /* ------------------------------------------ */
@@ -79,7 +93,7 @@ void updateButtons()
 /* ------------------------------------------ */
 void updateChannels()
 {
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < CHANNEL_COUNT; i++)
   {
     channels[i].update();
   }

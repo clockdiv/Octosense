@@ -11,6 +11,14 @@
 const uint8_t btns[] = {24, 25, 26, 27, 28, 29, 30, 31};
 const uint8_t btnsCnt = 8;
 
+// Analog Input Pins
+#define PIN_INPUT_A 23
+#define PIN_INPUT_B 22
+#define PIN_INPUT_C 21
+#define PIN_INPUT_D 20
+#define PIN_INPUT_E 17
+
+
 // Buttons as assigned in "buttonsPressed"-Array:
 #define BTN_A       0
 #define BTN_B       1
