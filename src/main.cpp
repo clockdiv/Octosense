@@ -1,11 +1,8 @@
 #include <Arduino.h>
 #include <ShiftRegister74HC595.h>
+#include <ADC.h>
 
-#ifdef ARDUINO_TEENSY31
-#include "pinsTeensy.h"
-#else
-#include "pinsArduino.h"
-#endif
+#include "pinDefinitions.h"
 
 #include "buttonsManager.h"
 #include "octoChannel.h"
@@ -14,6 +11,7 @@
 #define CHANNEL_COUNT 5
 
 ShiftRegister74HC595<SHIFT_REGISTER_CNT> sr(PIN_SERIALDATA, PIN_CLOCK, PIN_LATCH);
+ADC adc;
 
 ButtonsManager buttonsmanager(&sr);
 OctoChannel channels[CHANNEL_COUNT];
@@ -42,6 +40,15 @@ void setup()
   channels[3].init(3, ledsButtons[3], PIN_INPUT_D);
   channels[4].init(4, ledsButtons[4], PIN_INPUT_E);
 
+ 
+  adc.adc0->setAveraging(0); // set number of averages
+  adc.adc0->setResolution(10); // set bits of resolution
+  adc.adc0->setConversionSpeed(ADC_settings::ADC_CONVERSION_SPEED::HIGH_SPEED); // change the conversion speed
+  adc.adc0->setSamplingSpeed(ADC_settings::ADC_SAMPLING_SPEED::VERY_HIGH_SPEED); // change the sampling speed
+
+  adc.adc0->startContinuous(16);
+
+ 
   startupLEDSequence();
 
   // switch to channel 0 at startup
@@ -52,18 +59,32 @@ void setup()
 /* ------------------------------------------ */
 void loop()
 {
+
   updateButtons();
+  return;
   updateChannels();
 
   // mapButtonsToLEDs();
   // buttonsTest();
 }
 
+
 /* ------------------------------------------ */
 void updateButtons()
 {
   buttonsmanager.update();
 
+  // get touch buttons
+  //uint16_t t = buttonsmanager.touchbuttons[0].getValue();
+  //t = constrain(t, 2000, 4000);
+  //t = map(t, 2000, 4000, 0, 1023);
+  uint16_t t = adc.adc0->analogReadContinuous();
+  Serial.println(t);
+  voltmeter.setValue(t);
+  return;
+
+
+  // check if channel is changed
   if (buttonsmanager.buttons[BTN_A].hasRisen())
   {
     OctoChannel::setChannel(0);
@@ -88,6 +109,7 @@ void updateButtons()
   {
     OctoChannel::setChannel(5);
   }
+
 }
 
 /* ------------------------------------------ */

@@ -11,9 +11,9 @@ void Voltmeter::update()
 {
 }
 
-void Voltmeter::setValue(uint8_t _value)
+void Voltmeter::setValue(uint16_t _value)
 {
-    uint8_t v = _value / 40;
+    uint16_t v = _value / 150;
     for (int i = 0; i < ledsMeterCnt; i++)
     {
         if (i < v)

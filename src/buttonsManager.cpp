@@ -9,10 +9,13 @@ ButtonsManager::ButtonsManager(ShiftRegister74HC595<4> *_sr)
     sr = _sr;
     pinMode(PIN_BUTTON_1, INPUT_PULLUP);
     pinMode(PIN_BUTTON_2, INPUT_PULLUP);
+
+    touchbuttons[0].init(PIN_TOUCH_G);
+    touchbuttons[1].init(PIN_TOUCH_H);
 }
 
 /* ------------------------------------------ */
-uint8_t ButtonsManager::update()
+void ButtonsManager::update()
 {
     for (int i = 0; i < btnsCnt; i++)
     {
@@ -39,6 +42,10 @@ uint8_t ButtonsManager::update()
             buttons[i + 8].setState(LOW);
         }
     }
+
+    touchbuttons[0].update();
+    touchbuttons[1].update();
+
 }
 
 /* ------------------------------------------ */

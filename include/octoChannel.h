@@ -3,12 +3,7 @@
 
 #include <Arduino.h>
 
-#ifdef ARDUINO_TEENSY31
-#include "pinsTeensy.h"
-#else
-#include "pinsArduino.h"
-#endif
-
+#include "pinDefinitions.h"
 #include "ShiftRegister74HC595.h"
 #include "voltmeter.h"
 

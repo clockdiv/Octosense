@@ -1,16 +1,10 @@
-
-#ifdef ARDUINO_TEENSY31
-#include "pinsTeensy.h"
-#else
-#include "pinsArduino.h"
-#endif
-
 #ifndef VOLTMETER_H
 #define VOLTMETER_H
 
 #include <Arduino.h>
 #include "ShiftRegister74HC595.h"
 
+#include "pinDefinitions.h"
 
 class Voltmeter
 {
@@ -21,7 +15,7 @@ private:
 public:
     Voltmeter(ShiftRegister74HC595<SHIFT_REGISTER_CNT> *_sr);
     void update();
-    void setValue(uint8_t _value);
+    void setValue(uint16_t _value);
 };
 
 #endif
